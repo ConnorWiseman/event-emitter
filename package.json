@@ -1,0 +1,42 @@
+{
+  "name": "event-emitter",
+  "version": "0.0.0",
+  "description": "A client-side JavaScript implementation of Node.js's EventEmitter object.",
+  "main": "event-emitter.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "report-coverage": "codecov",
+    "test": "karma start test/karma.conf.js --single-run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ConnorWiseman/event-emitter.git"
+  },
+  "keywords": [
+    "events",
+    "EventEmitter"
+  ],
+  "author": "Connor Wiseman",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ConnorWiseman/event-emitter/issues"
+  },
+  "homepage": "https://github.com/ConnorWiseman/event-emitter#readme",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "codecov": "^2.1.0",
+    "karma": "^1.5.0",
+    "karma-chai": "^0.1.0",
+    "karma-coverage": "^1.1.1",
+    "karma-mocha": "^1.3.0",
+    "karma-mocha-reporter": "^2.2.3",
+    "karma-phantomjs-launcher": "^1.0.4",
+    "karma-sinon-chai": "^1.2.4",
+    "mocha": "^3.2.0",
+    "phantomjs-prebuilt": "^2.1.14",
+    "sinon": "^2.1.0",
+    "sinon-chai": "^2.9.0"
+  }
+}
