@@ -1,6 +1,6 @@
 {
   "name": "event-emitter",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "A client-side JavaScript implementation of Node.js's EventEmitter object.",
   "main": "event-emitter.js",
   "directories": {
