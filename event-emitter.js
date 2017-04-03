@@ -293,8 +293,14 @@
 
       if (this._listeners['removeListener'] !== undefined) {
         for (i = 0; i < eventNames.length; i++) {
+          if (eventNames[i] === 'removeListener') {
+            continue;
+          }
+
           _emitRemoveListeners(this, eventNames[i]);
         }
+
+        _emitRemoveListeners(this, 'removeListener');
       }
 
       this._listeners = {};
