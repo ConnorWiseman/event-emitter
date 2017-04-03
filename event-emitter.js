@@ -10,12 +10,12 @@
    * @param {String}       type
    * @private
    */
-  function _emitRemoveListeners(eventEmitter, type) {
-    var listeners = eventEmitter._listeners[type],
+  function _emitRemoveListeners(eventEmitter, eventName) {
+    var listeners = eventEmitter._listeners[eventName],
         i = 0;
 
     for (i; i < listeners.length; i++) {
-      eventEmitter.emit('removeListener', type, listeners[i]);
+      eventEmitter.emit('removeListener', eventName, listeners[i]);
     }
   };
 
@@ -40,25 +40,25 @@
 
   /**
    * @param  {EventEmitter} eventEmitter
-   * @param  {String}       type
+   * @param  {String}       eventName
    * @param  {Function}     listener
    * @param  {String}       method
    * @return {EventEmitter}
    * @throws {RangeError}
    * @private
    */
-  function _addListener(eventEmitter, type, listener, method) {
+  function _addListener(eventEmitter, eventName, listener, method) {
     var error;
 
     if (typeof listener !== 'function') {
       return _emitFunctionTypeError(eventEmitter);
     }
 
-    if (eventEmitter._listeners[type] === undefined) {
-      eventEmitter._listeners[type] = [];
+    if (eventEmitter._listeners[eventName] === undefined) {
+      eventEmitter._listeners[eventName] = [];
     }
 
-    if (eventEmitter._listeners[type].length >= eventEmitter._maxListeners) {
+    if (eventEmitter._listeners[eventName].length >= eventEmitter._maxListeners) {
       error = new RangeError('maxListeners exceeded');
 
       if (eventEmitter._listeners['error'] === undefined) {
@@ -70,10 +70,10 @@
     }
 
     if (eventEmitter._listeners['newListener'] !== undefined) {
-      eventEmitter.emit('newListener', type, listener);
+      eventEmitter.emit('newListener', eventName, listener);
     }
 
-    eventEmitter._listeners[type][method](listener);
+    eventEmitter._listeners[eventName][method](listener);
     return eventEmitter;
   };
 
@@ -112,32 +112,32 @@
 
 
   /**
-   * @param  {String}   type
+   * @param  {String}   eventName
    * @param  {Function} listener
    * @return {EventEmitter}
    * @public
    * @see {@link https://nodejs.org/api/events.html#events_emitter_addlistener_eventname_listener}
    */
-  EventEmitter.prototype.addListener = function(type, listener) {
+  EventEmitter.prototype.addListener = function(eventName, listener) {
     return this.on.apply(this, arguments);
   };
 
 
   /**
-   * @param  {String} type
+   * @param  {String} eventName
    * @param  {...*}   [arguments] Optional.
    * @return {Boolean}
    * @public
    * @see {@link https://nodejs.org/api/events.html#events_emitter_emit_eventname_args}
    */
-  EventEmitter.prototype.emit = function(type) {
+  EventEmitter.prototype.emit = function(eventName) {
     var listeners, args, i;
 
-    if (this._listeners[type] === undefined) {
+    if (this._listeners[eventName] === undefined) {
       return false;
     }
 
-    listeners = this._listeners[type].slice();
+    listeners = this._listeners[eventName].slice();
     args      = Array.prototype.slice.call(arguments, 1);
 
     for (i = 0; i < listeners.length; i++) {
@@ -169,13 +169,13 @@
 
 
   /**
-   * @param  {String} type
+   * @param  {String} eventName
    * @return {Number}
    * @public
    * @see {@link https://nodejs.org/api/events.html#events_emitter_listenercount_eventname}
    */
-  EventEmitter.prototype.listenerCount = function(type) {
-    var listeners = this._listeners[type];
+  EventEmitter.prototype.listenerCount = function(eventName) {
+    var listeners = this._listeners[eventName];
 
     if (listeners !== undefined) {
       return listeners.length;
@@ -186,13 +186,13 @@
 
 
   /**
-   * @param  {String} type
+   * @param  {String} eventName
    * @return {Array}
    * @public
    * @see {@link https://nodejs.org/api/events.html#events_emitter_listeners_eventname}
    */
-  EventEmitter.prototype.listeners = function(type) {
-    var listeners = this._listeners[type];
+  EventEmitter.prototype.listeners = function(eventName) {
+    var listeners = this._listeners[eventName];
 
     if (listeners !== undefined) {
       return listeners.slice();
@@ -203,97 +203,97 @@
 
 
   /**
-   * @param  {String}   type
+   * @param  {String}   eventName
    * @param  {Function} listener
    * @return {EventEmitter}
    * @public
    * @see {@link https://nodejs.org/api/events.html#events_emitter_on_eventname_listener}
    */
-  EventEmitter.prototype.on = function(type, listener) {
-    return _addListener(this, type, listener, 'push');
+  EventEmitter.prototype.on = function(eventName, listener) {
+    return _addListener(this, eventName, listener, 'push');
   };
 
 
   /**
-   * @param  {String}   type
+   * @param  {String}   eventName
    * @param  {Function} listener
    * @return {EventEmitter}
    * @public
    * @see {@link https://nodejs.org/api/events.html#events_emitter_once_eventname_listener}
    */
-  EventEmitter.prototype.once = function(type, listener) {
+  EventEmitter.prototype.once = function(eventName, listener) {
     if (typeof listener !== 'function') {
       return _emitFunctionTypeError(this);
     }
 
     function temp() {
-      this.removeListener(type, temp);
+      this.removeListener(eventName, temp);
       listener.apply(this, arguments);
     };
-    temp.type     = type;
-    temp.listener = listener;
+    temp.eventName = eventName;
+    temp.listener  = listener;
 
-    return this.on(type, temp);
+    return this.on(eventName, temp);
   };
 
 
   /**
-   * @param  {String}   type
+   * @param  {String}   eventName
    * @param  {Function} listener
    * @return {EventEmitter}
    * @public
    * @see {@link https://nodejs.org/api/events.html#events_emitter_prependlistener_eventname_listener}
    */
-  EventEmitter.prototype.prependListener = function(type, listener) {
-    return _addListener(this, type, listener, 'unshift');
+  EventEmitter.prototype.prependListener = function(eventName, listener) {
+    return _addListener(this, eventName, listener, 'unshift');
   };
 
 
   /**
-   * @param  {String}   type
+   * @param  {String}   eventName
    * @param  {Function} listener
    * @return {EventEmitter}
    * @public
    * @see {@link https://nodejs.org/api/events.html#events_emitter_prependoncelistener_eventname_listener}
    */
-  EventEmitter.prototype.prependOnceListener = function(type, listener) {
+  EventEmitter.prototype.prependOnceListener = function(eventName, listener) {
     if (typeof listener !== 'function') {
       return _emitFunctionTypeError(this);
     }
 
     function temp() {
-      this.removeListener(type, temp);
+      this.removeListener(eventName, temp);
       listener.apply(this, arguments);
     };
-    temp.type     = type;
-    temp.listener = listener;
+    temp.eventName = eventName;
+    temp.listener  = listener;
 
-    return this.prependListener(type, temp);
+    return this.prependListener(eventName, temp);
   };
 
 
   /**
-   * @param  {String} [type] Optional.
+   * @param  {String} [eventName] Optional.
    * @return {EventEmitter}
    * @public
    * @see {@link https://nodejs.org/api/events.html#events_emitter_removealllisteners_eventname}
    */
-  EventEmitter.prototype.removeAllListeners = function(type) {
-    var types, i;
+  EventEmitter.prototype.removeAllListeners = function(eventName) {
+    var eventNames, i;
 
-    if (type !== undefined && this._listeners[type] !== undefined) {
+    if (eventName !== undefined && this._listeners[eventName] !== undefined) {
       if (this._listeners['removeListener'] !== undefined) {
-        _emitRemoveListeners(this, type);
+        _emitRemoveListeners(this, eventName);
       }
 
-      delete this._listeners[type];
+      delete this._listeners[eventName];
     }
     else {
-      types = Object.keys(this._listeners);
+      eventNames = Object.keys(this._listeners);
 
       if (this._listeners['removeListener'] !== undefined) {
-        for (i = 0; i < types.length; i++) {
-          _emitRemoveListeners(this, types[i]);
+        for (i = 0; i < eventNames.length; i++) {
+          _emitRemoveListeners(this, eventNames[i]);
         }
       }
 
@@ -305,31 +305,31 @@
 
 
   /**
-   * @param  {String}   type
+   * @param  {String}   eventName
    * @param  {Function} listener
    * @return {EventEmitter}
    * @public
    * @see {@link https://nodejs.org/api/events.html#events_emitter_removelistener_eventname_listener}
    */
-  EventEmitter.prototype.removeListener = function(type, listener) {
+  EventEmitter.prototype.removeListener = function(eventName, listener) {
     var listeners, index;
 
-    if (this._listeners[type] === undefined) {
+    if (this._listeners[eventName] === undefined) {
       return this;
     }
 
-    listeners = this._listeners[type];
+    listeners = this._listeners[eventName];
     index     = listeners.indexOf(listener);
 
     if (index > -1) {
       if (this._listeners['removeListener'] !== undefined) {
-        this.emit('removeListener', type, listener);
+        this.emit('removeListener', eventName, listener);
       }
 
       listeners.splice(index, 1);
 
       if (listeners.length === 0) {
-        delete this._listeners[type];
+        delete this._listeners[eventName];
       }
     }
 
@@ -338,18 +338,18 @@
 
 
   /**
-   * @param  {Number} num
+   * @param  {Number} n
    * @return {EventEmitter}
    * @throws {TypeError}
    * @public
    * @see {@link https://nodejs.org/api/events.html#events_emitter_setmaxlisteners_n}
    */
-  EventEmitter.prototype.setMaxListeners = function(num) {
-    if (Math.floor(num) !== num || num <= 0) {
-      throw new TypeError('num must be a positive integer');
+  EventEmitter.prototype.setMaxListeners = function(n) {
+    if (Math.floor(n) !== n || n <= 0) {
+      throw new TypeError('n must be a positive integer');
     }
 
-    this._maxListeners = num;
+    this._maxListeners = n;
     return this;
   };
 
