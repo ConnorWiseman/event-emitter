@@ -80,7 +80,6 @@
 
   /**
    * @class
-   * @see {@link https://github.com/Gozala/events/blob/master/events.js}
    * @see {@link https://nodejs.org/api/events.html}
    */
 
